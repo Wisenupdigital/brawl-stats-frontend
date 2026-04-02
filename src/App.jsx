@@ -20,7 +20,7 @@ const rarityGlow = {
   "Legendary": "0 0 20px #f5a62377, 0 0 40px #f5a62320",
 };
 
-
+async function apiFetch(endpoint) {
   const res = await fetch(`${API_BASE}${endpoint}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
