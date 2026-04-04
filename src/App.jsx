@@ -2,6 +2,12 @@ import { useState, useEffect, useRef } from "react";
 
 const API_BASE = "https://brawl-stats-backend.onrender.com/api";
 
+// Garde le backend eveille toutes les 4 min
+setInterval(() => {
+  fetch(`${API_BASE.replace("/api", "")}/health`).catch(() => {});
+}, 4 * 60 * 1000);
+
+
 // Brawl Stars seasons start ~every 2 months from Jan 2023
 function getCurrentSeason() {
   const start = new Date("2023-01-01");
