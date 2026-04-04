@@ -532,21 +532,14 @@ function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
               <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 12, padding: 14 }}>
                 <div style={{ color: t.textSub, fontSize: "0.67em", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "DM Sans,sans-serif", marginBottom: 10 }}>Top Brawlers</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {player.brawlers?.sort((a, b) => b.trophies - a.trophies).slice(0, 5).map((b, i) => {
-                    const [imgErr, setImgErr] = useState(false);
-                    return (
-                      <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        {!imgErr ? (
-                          <img src={getBrawlerImage(b.name)} alt={b.name} style={{ width: 28, height: 28, objectFit: "contain" }} onError={() => setImgErr(true)} />
-                        ) : (
-                          <div style={{ width: 28, height: 28, background: `${t.accent}15`, borderRadius: 6 }} />
-                        )}
-                        <span style={{ color: i < 3 ? [t.accent, "rgba(255,255,255,0.5)", "rgba(205,127,50,0.8)"][i] : "rgba(255,255,255,0.2)", fontSize: "0.78em", minWidth: 18, fontFamily: "Outfit,sans-serif", fontWeight: 800 }}>#{i + 1}</span>
-                        <span style={{ flex: 1, color: "rgba(255,255,255,0.75)", fontSize: "0.84em", fontFamily: "DM Sans,sans-serif" }}>{b.name}</span>
-                        <span style={{ color: t.accent, fontSize: "0.8em", fontFamily: "Outfit,sans-serif", fontWeight: 700 }}>{b.trophies.toLocaleString()}</span>
-                      </div>
-                    );
-                  })}
+                  {player.brawlers?.sort((a, b) => b.trophies - a.trophies).slice(0, 5).map((b, i) => (
+                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <img src={getBrawlerImage(b.name)} alt={b.name} style={{ width: 28, height: 28, objectFit: "contain" }} onError={e => { e.target.style.opacity = "0"; }} />
+                      <span style={{ color: i < 3 ? [t.accent, "rgba(255,255,255,0.5)", "rgba(205,127,50,0.8)"][i] : "rgba(255,255,255,0.2)", fontSize: "0.78em", minWidth: 18, fontFamily: "Outfit,sans-serif", fontWeight: 800 }}>#{i + 1}</span>
+                      <span style={{ flex: 1, color: "rgba(255,255,255,0.75)", fontSize: "0.84em", fontFamily: "DM Sans,sans-serif" }}>{b.name}</span>
+                      <span style={{ color: t.accent, fontSize: "0.8em", fontFamily: "Outfit,sans-serif", fontWeight: 700 }}>{b.trophies.toLocaleString()}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
