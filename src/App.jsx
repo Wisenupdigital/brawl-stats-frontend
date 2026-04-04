@@ -821,14 +821,6 @@ export default function BrawlStarsApp() {
   const [savedTag, setSavedTag] = useState(() => { try { return localStorage.getItem("bs_tag") || null; } catch { return null; } });
   const theme = THEMES[themeKey] || THEMES.nova;
 
-useEffect(() => {
-  const keepAlive = setInterval(() => {
-    fetch(`${API_BASE.replace("/api", "")}/health`).catch(() => {});
-  }, 4 * 60 * 1000);
-  return () => clearInterval(keepAlive);
-}, []);
-
-  
   const handleThemeSwitch = (key) => {
     setThemeKey(key);
     try { localStorage.setItem("bs_theme", key); } catch {}
