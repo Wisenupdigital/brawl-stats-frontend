@@ -413,10 +413,6 @@ function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
   const [history, setHistory] = useState(null);
   const t = theme;
 
-  useEffect(() => {
-    if (savedTag) doSearch(savedTag);
-  }, []);
-
   const doSearch = async (searchTag) => {
     const clean = (searchTag || tag).trim().replace(/^#/, "").toUpperCase();
     if (!clean) return;
@@ -436,7 +432,11 @@ function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
       onTagSaved(null);
     }
     setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    if (savedTag) doSearch(savedTag);
+  }, []);;
 
   const logout = () => {
     setPlayer(null); setTag(""); onTagSaved(null); setError(null); setHistory(null);
