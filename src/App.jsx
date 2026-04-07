@@ -139,85 +139,156 @@ function TrophyChart({ trophies, highestTrophies, realHistory, accent, mode = "w
 
   const pathD = vd.map((v, i) => {
     if (i === 0) return `M${toX(0)},${toY(v)}`;
+function TrophyChart({ trophies, highestTrophies, playerTag }) {
+  const [progress, setProgress] = useState(0);
+  const [realData, setRealData] = useState(null);
+  const rafRef = useRef(null);
+  const dataRef = useRef([]);
+
+  useEffect(() => {
+    if (!playerTag) return;
+    const clean = playerTag.replace(/^#/, "");
+    fetch(`${API_BASE}/players/%23${clean}/history?days=90`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.history?.length >= 2) {
+          setRealData(d.history);
+        } else {
+          setRealData(null);
+        }
+      })
+      .catch(() => setRealData(null));
+  }, [playerTag]);
+
+  useEffect(() => {
+    const raw = realData
+      ? realData.map(p => p.trophies)
+      : generateTrophyHistory(trophies, highestTrophies);
+    dataRef.current = raw;
+    setProgress(0);
+    let start = null;
+    const ease = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const step = ts => {
+      if (!start) start = ts;
+      const p = Math.min(1, ease((ts - start) / 1500));
+      setProgress(p);
+      if (p < 1) rafRef.current = requestAnimationFrame(step);
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => rafRef.current && cancelAnimationFrame(rafRef.current);
+  }, [trophies, highestTrophies, realData]);
+
+  const data = dataRef.current;
+  if (!data || data.length < 2) return null;
+
+  const W = 540, H = 150;
+  const PAD = { top: 20, right: 20, bottom: 30, left: 50 };
+  const iW = W - PAD.left - PAD.right;
+  const iH = H - PAD.top - PAD.bottom;
+  const minV = Math.min(...data) * 0.9;
+  const maxV = Math.max(...data) * 1.06;
+
+  const toX = i => PAD.left + (i / (data.length - 1)) * iW;
+  const toY = v => PAD.top + iH - ((v - minV) / (maxV - minV)) * iH;
+
+  const visible = Math.max(2, Math.round(progress * (data.length - 1)) + 1);
+  const vd = data.slice(0, visible);
+
+  const pathD = vd.map((v, i) => {
+    if (i === 0) return `M${toX(0)},${toY(v)}`;
     const px = toX(i - 1), py = toY(vd[i - 1]);
     const cx = toX(i), cy = toY(v);
     const cpx = (px + cx) / 2;
     return `C${cpx},${py} ${cpx},${cy} ${cx},${cy}`;
   }).join(" ");
-  const areaD = pathD + ` L${toX(visible - 1)},${PAD.top + iH} L${toX(0)},${PAD.top + iH} Z`;
+
+  const areaD = pathD + ` L${toX(visible-1)},${PAD.top+iH} L${toX(0)},${PAD.top+iH} Z`;
+  const isUp = data[data.length - 1] >= data[0];
+  const lineColor = isUp ? "#f5a623" : "#e85555";
+
+  const months = ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"];
   const yTicks = [minV, (minV + maxV) / 2, maxV];
 
-  // Labels semaine
-  const weekLabels = Array.from({ length: data.length }, (_, i) => {
-    const w = season.weekInSeason - (data.length - 1 - i);
-    if (w <= 0) return `S${season.season - 1}`;
-    return `S${season.season} W${w}`;
-  });
+  // Labels X — dates réelles si dispo
+  const xLabels = realData
+    ? realData.map(p => {
+        const d = new Date(p.period);
+        return `${d.getDate()} ${months[d.getMonth()]}`;
+      })
+    : null;
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {realData && (
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4caf75" }} />
+          <span style={{ color: "#4caf75", fontSize: "0.65em", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+            Historique réel · {realData.length} jours
+          </span>
+        </div>
+      )}
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}>
         <defs>
           <linearGradient id="chartArea" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={accent} stopOpacity="0.2" />
-            <stop offset="100%" stopColor={accent} stopOpacity="0.01" />
+            <stop offset="0%" stopColor={lineColor} stopOpacity="0.18" />
+            <stop offset="100%" stopColor={lineColor} stopOpacity="0.01" />
           </linearGradient>
           <filter id="glow">
             <feGaussianBlur stdDeviation="2" result="b" />
             <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
+
         {yTicks.map((v, i) => (
           <g key={i}>
-            <line x1={PAD.left} x2={W - PAD.right} y1={toY(v)} y2={toY(v)} stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="3,4" />
-            <text x={PAD.left - 7} y={toY(v) + 4} textAnchor="end" fill="rgba(255,255,255,0.25)" fontSize="9" fontFamily="DM Sans,sans-serif">
-              {v >= 1000 ? `${(v / 1000).toFixed(1)}k` : Math.round(v)}
+            <line x1={PAD.left} x2={W - PAD.right} y1={toY(v)} y2={toY(v)} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+            <text x={PAD.left - 7} y={toY(v) + 4} textAnchor="end" fill="#333" fontSize="9.5" fontFamily="'DM Sans', sans-serif">
+              {v >= 1000 ? `${(v/1000).toFixed(1)}k` : Math.round(v)}
             </text>
           </g>
         ))}
+
         {data.map((_, i) => {
-          if (i % 2 !== 0 && i !== data.length - 1) return null;
+          if (i % Math.ceil(data.length / 4) !== 0 && i !== data.length - 1) return null;
+          const label = xLabels ? xLabels[i] : `J${i+1}`;
           return (
-            <text key={i} x={toX(i)} y={H - 4} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="8.5" fontFamily="DM Sans,sans-serif">
-              {weekLabels[i]}
+            <text key={i} x={toX(i)} y={H - 4} textAnchor="middle" fill="#2e2e2e" fontSize="9.5" fontFamily="'DM Sans', sans-serif">
+              {label}
             </text>
           );
         })}
+
         {vd.length > 1 && <path d={areaD} fill="url(#chartArea)" />}
-        {vd.length > 1 && <path d={pathD} fill="none" stroke={accent} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)" />}
+        {vd.length > 1 && (
+          <path d={pathD} fill="none" stroke={lineColor} strokeWidth="2.2"
+            strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)" />
+        )}
+
         {(() => {
           const peakVal = Math.max(...vd);
           const peakI = vd.indexOf(peakVal);
           if (peakI < 0 || peakI === vd.length - 1) return null;
           return (
             <g>
-              <circle cx={toX(peakI)} cy={toY(peakVal)} r={4} fill={accent} stroke="#0a0b14" strokeWidth="2" />
-              <text x={toX(peakI)} y={toY(peakVal) - 9} textAnchor="middle" fill={accent} fontSize="9" fontWeight="700" fontFamily="DM Sans,sans-serif">
-                ^ {peakVal.toLocaleString()}
+              <circle cx={toX(peakI)} cy={toY(peakVal)} r={4} fill="#f5a623" stroke="#0d0f14" strokeWidth="2" />
+              <text x={toX(peakI)} y={toY(peakVal) - 9} textAnchor="middle" fill="#f5a623" fontSize="9" fontWeight="700" fontFamily="'DM Sans', sans-serif">
+                ▲ {peakVal.toLocaleString()}
               </text>
             </g>
           );
         })()}
+
         {vd.length > 1 && (() => {
           const last = vd[vd.length - 1];
           const x = toX(vd.length - 1), y = toY(last);
           return (
             <g>
-              <circle cx={x} cy={y} r={5} fill={accent} stroke="#0a0b14" strokeWidth="2.5" />
-              <circle cx={x} cy={y} r={9} fill={accent} fillOpacity="0.12" />
+              <circle cx={x} cy={y} r={5} fill={lineColor} stroke="#0d0f14" strokeWidth="2.5" />
+              <circle cx={x} cy={y} r={9} fill={lineColor} fillOpacity="0.12" />
             </g>
           );
         })()}
       </svg>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: isReal ? "#4caf75" : "rgba(255,255,255,0.2)" }} />
-        <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.68em", fontFamily: "DM Sans,sans-serif" }}>
-          {isReal
-            ? `Donnees reelles (${realHistory.length} points) - Saison ${season.season}, Semaine ${season.weekInSeason}/${season.totalWeeks}`
-            : `Courbe estimee - Saison ${season.season}, Semaine ${season.weekInSeason}/${season.totalWeeks}`
-          }
-        </span>
-      </div>
     </div>
   );
 }
@@ -560,9 +631,10 @@ function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
                     <div style={{ color: "#29b6f6", fontFamily: "Outfit,sans-serif", fontWeight: 800, fontSize: "1.7em", letterSpacing: "-0.04em" }}>{player.highestTrophies?.toLocaleString()}</div>
                   </div>
                 </div>
-                <TrophyChart
-                  trophies={player.trophies}
-                  highestTrophies={player.highestTrophies}
+                <TrophyChart 
+                  trophies={player.trophies} 
+                  highestTrophies={player.highestTrophies} 
+                  playerTag={player.tag}
                   realHistory={history}
                   accent={t.accent}
                   mode="week"
