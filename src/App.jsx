@@ -447,6 +447,7 @@ function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
     { id: "chart", label: "Courbe" },
     { id: "brawlers", label: "Brawlers" },
     { id: "battles", label: "Batailles" },
+    { id: "battlelog", label: "⚔️ Parties" },
   ];
 
   return (
@@ -599,6 +600,8 @@ function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
               ))}
             </div>
           )}
+
+          {tab === "battlelog" && <BattleLogInline tag={player.tag} />}
 
           {/* Batailles */}
           {tab === "battles" && (
