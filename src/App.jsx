@@ -1155,7 +1155,7 @@ function FilterBar({ active, onChange }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export function BattleLogPage() {
+function BattleLogPage() {
   // NOTE: dans l'app complète, passe playerTag en prop depuis PlayerSearchPage
   // ou utilise un state global / context. Ici on gère une recherche locale.
   const [tag, setTag] = useState("");
