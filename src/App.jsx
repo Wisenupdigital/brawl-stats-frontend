@@ -1313,7 +1313,63 @@ function EventsPage({ theme }) {
     </div>
   );
 }
+// VERSION INLINE pour PlayerSearchPage (tab "⚔️ Parties")
+// ════════════════════════════════════════════════════════════════════
 
+function BattleLogInline({ tag }) {
+  const [battles, setBattles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    if (!tag) return;
+    setLoading(true);
+    const clean = tag.replace(/^#/, "");
+    apiFetch(`/players/%23${clean}/battlelog`)
+      .then(d => setBattles(d.items || []))
+      .catch(() => setError("Battle log indisponible"))
+      .finally(() => setLoading(false));
+  }, [tag]);
+
+  const filtered = battles.filter(b => {
+    if (filter === "all") return true;
+    if (filter === "victory") return getResult(b, tag) === "victory";
+    if (filter === "defeat") return getResult(b, tag) === "defeat";
+    if (filter === "ranked") return b.event?.mode?.toLowerCase().includes("ranked");
+    return true;
+  });
+
+  if (loading) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 36, gap: 10 }}>
+      <div style={{ width: 28, height: 28, border: "2px solid rgba(245,166,35,0.15)", borderTop: "2px solid #f5a623", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+      <span style={{ color: "#333", fontSize: "0.75em", fontFamily: "'DM Sans', sans-serif" }}>Chargement du battle log…</span>
+    </div>
+  );
+
+  if (error) return (
+    <div style={{ background: "rgba(232,85,85,0.07)", border: "1px solid rgba(232,85,85,0.18)", borderRadius: 10, padding: 14, color: "#c94a4a", fontSize: "0.8em", fontFamily: "'DM Sans', sans-serif" }}>
+      {error}
+    </div>
+  );
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {battles.length > 0 && <BattleStats battles={battles} playerTag={tag} />}
+      <FilterBar active={filter} onChange={setFilter} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        {filtered.map((b, i) => (
+          <BattleCard key={i} battle={b} playerTag={tag} index={i} />
+        ))}
+      </div>
+      {filtered.length === 0 && (
+        <div style={{ textAlign: "center", color: "#252525", padding: 24, fontFamily: "'DM Sans', sans-serif", fontSize: "0.82em" }}>
+          Aucune partie pour ce filtre
+        </div>
+      )}
+    </div>
+  );
+      }
 // ============================================================
 //  APP ROOT
 // ============================================================
