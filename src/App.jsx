@@ -98,47 +98,7 @@ function generateEstimatedHistory(currentTrophies, highestTrophies, mode = "week
   return data;
 }
 
-function TrophyChart({ trophies, highestTrophies, realHistory, accent, mode = "week" }) {
-  const [progress, setProgress] = useState(0);
-  const rafRef = useRef(null);
-  const season = getCurrentSeason();
 
-  const rawData = realHistory && realHistory.length >= 2
-    ? realHistory.map(r => parseInt(r.trophies))
-    : generateEstimatedHistory(trophies, highestTrophies, mode);
-
-  const dataRef = useRef(rawData);
-  const isReal = realHistory && realHistory.length >= 2;
-
-  useEffect(() => {
-    dataRef.current = rawData;
-    setProgress(0);
-    let start = null;
-    const ease = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    const step = (ts) => {
-      if (!start) start = ts;
-      const p = Math.min(1, ease((ts - start) / 1400));
-      setProgress(p);
-      if (p < 1) rafRef.current = requestAnimationFrame(step);
-    };
-    rafRef.current = requestAnimationFrame(step);
-    return () => rafRef.current && cancelAnimationFrame(rafRef.current);
-  }, [trophies, highestTrophies, realHistory]);
-
-  const data = dataRef.current;
-  const W = 540, H = 155;
-  const PAD = { top: 22, right: 20, bottom: 32, left: 50 };
-  const iW = W - PAD.left - PAD.right;
-  const iH = H - PAD.top - PAD.bottom;
-  const minV = Math.min(...data) * 0.9;
-  const maxV = Math.max(...data) * 1.05;
-  const toX = i => PAD.left + (i / (data.length - 1)) * iW;
-  const toY = v => PAD.top + iH - ((v - minV) / (maxV - minV)) * iH;
-  const visible = Math.max(2, Math.round(progress * (data.length - 1)) + 1);
-  const vd = data.slice(0, visible);
-
-  const pathD = vd.map((v, i) => {
-    if (i === 0) return `M${toX(0)},${toY(v)}`;
 function TrophyChart({ trophies, highestTrophies, playerTag }) {
   const [progress, setProgress] = useState(0);
   const [realData, setRealData] = useState(null);
