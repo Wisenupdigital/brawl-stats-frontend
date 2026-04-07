@@ -123,7 +123,7 @@ function TrophyChart({ trophies, highestTrophies, playerTag }) {
   useEffect(() => {
     const raw = realData
       ? realData.map(p => p.trophies)
-      : generateTrophyHistory(trophies, highestTrophies);
+      : generateEstimatedHistory(trophies, highestTrophies);
     dataRef.current = raw;
     setProgress(0);
     let start = null;
