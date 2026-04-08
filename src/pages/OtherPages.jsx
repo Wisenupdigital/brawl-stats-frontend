@@ -10,41 +10,6 @@ export function BrawlersPage({ theme }) {
   return <BrawlersPageNew theme={theme} />;
 }
 
-  useEffect(() => {
-    setLoading(true);
-    apiFetch("/brawlers?limit=100").then(d => setBrawlers(d.items || [])).catch(() => setBrawlers([])).finally(() => setLoading(false));
-  }, []);
-
-  const rarities = ["All", ...Object.keys(rarityColors)];
-  const filtered = brawlers.filter(b =>
-    (filter === "All" || b.rarity?.name === filter) &&
-    b.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div>
-        <h2 style={{ fontFamily: "Outfit,sans-serif", fontWeight: 800, color: t.text, fontSize: "1.45em", letterSpacing: "-0.03em", margin: 0 }}>Brawlers</h2>
-        <p style={{ color: t.textSub, fontSize: "0.78em", margin: "3px 0 0", fontFamily: "DM Sans,sans-serif" }}>{brawlers.length} brawlers</p>
-      </div>
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..."
-        style={{ background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: t.text, fontSize: "0.88em", outline: "none", fontFamily: "DM Sans,sans-serif" }}
-        onFocus={e => e.target.style.borderColor = `${t.accent}88`}
-        onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
-      />
-      <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-        {rarities.map(r => (
-          <button key={r} onClick={() => setFilter(r)} style={{ background: filter === r ? (rarityColors[r] || t.accent) : "rgba(255,255,255,0.04)", border: `1px solid ${rarityColors[r] ? rarityColors[r] + "33" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, padding: "4px 11px", color: filter === r ? "#111" : t.textSub, fontSize: "0.7em", fontWeight: 700, cursor: "pointer", fontFamily: "DM Sans,sans-serif", letterSpacing: "0.05em", transition: "all 0.15s" }}>{r}</button>
-        ))}
-      </div>
-      {loading ? <LoadingSpinner accent={t.accent} /> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: 8 }}>
-          {filtered.map(b => <BrawlerCard key={b.id} brawler={b} theme={t} />)}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ============================================================
 //  RANKINGS PAGE
