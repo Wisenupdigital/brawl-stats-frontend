@@ -7,7 +7,7 @@ export async function apiFetch(endpoint) {
 }
 
 export function getBrawlerImage(name, id) {
-  if (id) return `https://cdn.brawlify.com/brawler/borderless/${id}.png`;
+  if (id) return `https://cdn.brawlify.com/brawlers/borderless/${id}.png`;
   if (!name) return null;
   return `https://cdn.brawlify.com/brawler/borderless/${name.trim().replace(/\s+/g, "_")}.png`;
 }
