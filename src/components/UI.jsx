@@ -25,8 +25,7 @@ export function BrawlerCard({ brawler, theme }) {
   const rarity = brawler.rarity?.name || "Common";
   const color = rarityColors[rarity] || "#aaa";
   const [imgError, setImgError] = useState(false);
-  const imgUrl = getBrawlerImage(brawler.name);
-
+  const imgUrl = getBrawlerImage(brawler.name, brawler.id);
   return (
     <div
       style={{ background: theme.bgCard, border: `1px solid ${color}28`, borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, cursor: "default", transition: "transform 0.16s, box-shadow 0.16s" }}
