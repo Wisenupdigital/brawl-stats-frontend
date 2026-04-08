@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react";
 import { apiFetch, rarityColors } from "../utils/constants";
 import { LoadingSpinner, BrawlerCard, RankingRow, StatBadge } from "../components/UI";
+import { BrawlersPageNew } from "../components/BrawlerDetail";
 
 // ============================================================
 //  BRAWLERS PAGE
 // ============================================================
 export function BrawlersPage({ theme }) {
-  const [brawlers, setBrawlers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState("All");
-  const [search, setSearch] = useState("");
-  const t = theme;
+  return <BrawlersPageNew theme={theme} />;
+}
 
   useEffect(() => {
     setLoading(true);
