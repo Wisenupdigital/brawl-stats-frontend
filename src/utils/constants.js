@@ -6,10 +6,10 @@ export async function apiFetch(endpoint) {
   return res.json();
 }
 
-export function getBrawlerImage(name) {
+export function getBrawlerImage(name, id) {
+  if (id) return `https://cdn.brawlify.com/brawler/borderless/${id}.png`;
   if (!name) return null;
-  const clean = name.trim().replace(/\s+/g, "_");
-  return `https://cdn.brawlify.com/brawler/borderless/${clean}.png`;
+  return `https://cdn.brawlify.com/brawler/borderless/${name.trim().replace(/\s+/g, "_")}.png`;
 }
 
 export function generateEstimatedHistory(currentTrophies, highestTrophies, mode = "week") {
