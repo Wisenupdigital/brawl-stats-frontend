@@ -1,30 +1,4 @@
-// ================================================================
-// INSTRUCTIONS D'INTÉGRATION
-// ================================================================
-// 1. Dans src/utils/constants.js — REMPLACER la fonction getBrawlerImage :
-//
-//    export function getBrawlerImage(name, id) {
-//      if (id) return `https://cdn.brawlify.com/brawler/borderless/${id}.png`;
-//      if (!name) return null;
-//      const clean = name.trim().replace(/\s+/g, "_");
-//      return `https://cdn.brawlify.com/brawler/borderless/${clean}.png`;
-//    }
-//
-// 2. Dans src/components/UI.jsx — MODIFIER BrawlerCard pour passer l'id :
-//    Remplacer :  const imgUrl = getBrawlerImage(brawler.name);
-//    Par :        const imgUrl = getBrawlerImage(brawler.name, brawler.id);
-//
-// 3. Dans src/components/UI.jsx — MODIFIER PlayerBrawlerRow pour passer l'id :
-//    Remplacer :  <img src={getBrawlerImage(b.name)} ...
-//    Par :        <img src={getBrawlerImage(b.name, b.id)} ...
-//
-// 4. Dans src/pages/OtherPages.jsx — REMPLACER BrawlersPage entière
-//    par la version ci-dessous (BrawlersPageNew)
-//
-// 5. Dans src/App.jsx — import déjà présent, pas de changement nécessaire
-// ================================================================
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { rarityColors, rarityGlow, apiFetch, getBrawlerImage } from "../utils/constants";
 import { LoadingSpinner } from "./UI";
 
@@ -389,7 +363,7 @@ export function BrawlersPageNew({ theme }) {
   const [selected, setSelected] = useState(null);
   const t = theme;
 
-  useState(() => {
+  useEffect(() => {
     setLoading(true);
     apiFetch("/brawlers?limit=200")
       .then(d => setBrawlers(d.items || []))
