@@ -3,6 +3,7 @@ import { API_BASE, apiFetch, getBrawlerImage } from "../utils/constants";
 import { LoadingSpinner, StatBadge, PlayerBrawlerRow } from "../components/UI";
 import TrophyChart from "../components/TrophyChart";
 import { BattleLogInline } from "../components/BattleLog";
+import PlayerOverview from "../components/PlayerOverview";
 
 // ── BattleLog legacy (tab "Batailles") ───────────────────────────────────────
 function BattleLog({ tag, theme }) {
