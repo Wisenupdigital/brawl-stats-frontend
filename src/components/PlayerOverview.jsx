@@ -2,7 +2,7 @@ import { getBrawlerImage } from "../utils/constants";
 import { rarityColors } from "../utils/constants";
 
 // ── Avatar joueur ─────────────────────────────────────────────
-function PlayerAvatar({ iconId, expLevel, accent, size = 54 }) {
+export function PlayerAvatar({ iconId, expLevel, accent, size = 54 }) {
   const url = iconId
     ? `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`
     : null;
