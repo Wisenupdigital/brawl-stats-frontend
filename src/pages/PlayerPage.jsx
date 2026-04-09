@@ -3,7 +3,7 @@ import { API_BASE, apiFetch, getBrawlerImage } from "../utils/constants";
 import { LoadingSpinner, StatBadge, PlayerBrawlerRow } from "../components/UI";
 import TrophyChart from "../components/TrophyChart";
 import { BattleLogInline } from "../components/BattleLog";
-import PlayerOverview from "../components/PlayerOverview";
+import PlayerOverview, { PlayerAvatar } from "../components/PlayerOverview";
 
 // ── BattleLog legacy (tab "Batailles") ───────────────────────────────────────
 function BattleLog({ tag, theme }) {
@@ -154,9 +154,7 @@ export default function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
           {/* Header */}
           <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 14, padding: 16 }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-              <div style={{ width: 50, height: 50, background: `linear-gradient(135deg, ${t.accent}30, ${t.accentAlt}20)`, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: "Outfit,sans-serif", fontWeight: 800, fontSize: "1.1em", color: t.accent }}>
-                {player.expLevel}
-              </div>
+              <PlayerAvatar iconId={player.icon?.id} expLevel={player.expLevel} accent={t.accent} size={50} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ color: t.text, fontFamily: "Outfit,sans-serif", fontWeight: 800, fontSize: "1.1em", letterSpacing: "-0.025em" }}>{player.name}</div>
                 <div style={{ color: t.textSub, fontSize: "0.73em", fontFamily: "DM Sans,sans-serif", marginTop: 1 }}>{player.tag}</div>
@@ -190,20 +188,7 @@ export default function PlayerSearchPage({ theme, savedTag, onTagSaved }) {
           </div>
 
           {/* Apercu */}
-          {tab === "overview" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {[
-                  { label: "Niveau EXP", val: player.expLevel, sub: `${player.expPoints?.toLocaleString()} pts`, c: t.accent },
-                  { label: "Brawlers", val: player.brawlers?.length, sub: "debloques", c: "#29b6f6" },
-                ].map(s => (
-                  <div key={s.label} style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 12, padding: 14 }}>
-                    <div style={{ color: t.textSub, fontSize: "0.67em", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "DM Sans,sans-serif", marginBottom: 5 }}>{s.label}</div>
-                    <div style={{ color: s.c, fontFamily: "Outfit,sans-serif", fontWeight: 800, fontSize: "1.7em", letterSpacing: "-0.04em" }}>{s.val}</div>
-                    <div style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.7em", fontFamily: "DM Sans,sans-serif", marginTop: 2 }}>{s.sub}</div>
-                  </div>
-                ))}
-              </div>
+          {tab === "overview" && <PlayerOverview player={player} theme={t} />}
               <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: 12, padding: 14 }}>
                 <div style={{ color: t.textSub, fontSize: "0.67em", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "DM Sans,sans-serif", marginBottom: 10 }}>Top Brawlers</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
