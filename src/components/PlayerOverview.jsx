@@ -311,16 +311,17 @@ export default function PlayerOverview({ player, theme }) {
   const [rarityMap, setRarityMap] = useState({});
 
   useEffect(() => {
-    apiFetch("/brawlers?limit=200")
-      .then(d => {
-        const map = {};
-        (d.items || []).forEach(b => {
-          map[b.id] = b.rarity?.name || "Common";
-        });
-        setRarityMap(map);
-      })
-      .catch(() => {});
-  }, []);
+  fetch("https://api.brawlify.com/v1/brawlers")
+    .then(r => r.json())
+    .then(d => {
+      const map = {};
+      (d.list || []).forEach(b => {
+        map[b.id] = b.rarity?.name || "Common";
+      });
+      setRarityMap(map);
+    })
+    .catch(() => {});
+}, []);
 
   const enrichedBrawlers = (player.brawlers || []).map(b => ({
     ...b,
