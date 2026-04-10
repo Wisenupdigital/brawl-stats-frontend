@@ -1,5 +1,5 @@
-import { getBrawlerImage } from "../utils/constants";
-import { rarityColors } from "../utils/constants";
+import { useState, useEffect } from "react";
+import { getBrawlerImage, rarityColors, apiFetch } from "../utils/constants";
 
 // ── Avatar joueur ─────────────────────────────────────────────
 export function PlayerAvatar({ iconId, expLevel, accent, size = 54 }) {
