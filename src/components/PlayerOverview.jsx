@@ -308,7 +308,24 @@ function RarityBreakdown({ brawlers, theme }) {
 // ── Composant principal ───────────────────────────────────────
 export default function PlayerOverview({ player, theme }) {
   const t = theme;
-  const topBrawlers = [...(player.brawlers || [])].sort((a, b) => b.trophies - a.trophies).slice(0, 5);
+  const [rarityMap, setRarityMap] = useState({});
+
+  useEffect(() => {
+    apiFetch("/brawlers?limit=200")
+      .then(d => {
+        const map = {};
+        (d.items || []).forEach(b => {
+          map[b.id] = b.rarity?.name || "Common";
+        });
+        setRarityMap(map);
+      })
+      .catch(() => {});
+  }, []);
+
+  const enrichedBrawlers = (player.brawlers || []).map(b => ({
+    ...b,
+    rarity: { name: rarityMap[b.id] || null },
+  }));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -353,10 +370,10 @@ export default function PlayerOverview({ player, theme }) {
       </div>
 
       {/* Trophées par seuil */}
-      <TrophyMilestones brawlers={player.brawlers} accent={t.accent} />
+      <TrophyMilestones brawlers={enrichedBrawlers} accent={t.accent} />
 
       {/* Répartition par rareté */}
-      <RarityBreakdown brawlers={player.brawlers} theme={t} />
+      <RarityBreakdown brawlers={enrichedBrawlers} theme={t} />
 
     </div>
   );
