@@ -306,6 +306,89 @@ function RarityBreakdown({ brawlers, theme }) {
 }
 
 // ── Composant principal ───────────────────────────────────────
+function PowerLevelChart({ brawlers }) {
+  const counts = {};
+  for (let i = 1; i <= 11; i++) counts[i] = 0;
+  (brawlers || []).forEach(b => {
+    const p = b.power;
+    if (p >= 1 && p <= 11) counts[p]++;
+  });
+
+  const max = Math.max(...Object.values(counts));
+  const avg = brawlers?.length
+    ? (brawlers.reduce((s, b) => s + b.power, 0) / brawlers.length).toFixed(1)
+    : 0;
+  const maxed = counts[11] || 0;
+
+  const levelColors = {
+    1: "#555", 2: "#555", 3: "#555", 4: "#555",
+    5: "#90a4ae", 6: "#90a4ae",
+    7: "#4caf75", 8: "#4caf75", 9: "#4caf75",
+    10: "#29b6f6",
+    11: "#9c6fde",
+  };
+
+  return (
+    <div style={{
+      background: "rgba(255,255,255,0.03)",
+      border: "1px solid rgba(255,255,255,0.06)",
+      borderRadius: 12, padding: 14,
+    }}>
+      <div style={{
+        color: "rgba(255,255,255,0.3)", fontSize: "0.6em",
+        textTransform: "uppercase", letterSpacing: "0.13em",
+        fontFamily: "DM Sans,sans-serif", marginBottom: 14,
+        display: "flex", alignItems: "center", gap: 6,
+      }}>
+        ⚡ Par niveau de puissance
+      </div>
+
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 5, height: 80 }}>
+        {Array.from({ length: 11 }, (_, i) => i + 1).map(level => {
+          const count = counts[level];
+          const pct = max > 0 ? (count / max) * 100 : 0;
+          const color = levelColors[level];
+          return (
+            <div key={level} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, height: "100%", justifyContent: "flex-end" }}>
+              {count > 0 && (
+                <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.58em", fontFamily: "Outfit,sans-serif", fontWeight: 700 }}>{count}</span>
+              )}
+              <div style={{
+                width: "100%",
+                height: `${Math.max(4, pct)}%`,
+                background: color,
+                borderRadius: "3px 3px 0 0",
+                opacity: count === 0 ? 0.15 : 1,
+                transition: "height 1s cubic-bezier(.4,0,.2,1)",
+              }} />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Labels X */}
+      <div style={{ display: "flex", gap: 5, marginTop: 5 }}>
+        {Array.from({ length: 11 }, (_, i) => i + 1).map(level => (
+          <div key={level} style={{ flex: 1, textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: "0.58em", fontFamily: "DM Sans,sans-serif" }}>
+            {level}
+          </div>
+        ))}
+      </div>
+
+      {/* Avg + Maxed */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72em", fontFamily: "DM Sans,sans-serif" }}>
+          Avg: <span style={{ color: "#4caf75", fontWeight: 700 }}>{avg}</span>
+        </span>
+        <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72em", fontFamily: "DM Sans,sans-serif" }}>
+          Maxed: <span style={{ color: "#9c6fde", fontWeight: 700 }}>{maxed}</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
 export default function PlayerOverview({ player, theme }) {
   const t = theme;
   const [rarityMap, setRarityMap] = useState({});
