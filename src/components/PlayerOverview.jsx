@@ -458,6 +458,7 @@ export default function PlayerOverview({ player, theme }) {
 
       {/* Répartition par rareté */}
       <RarityBreakdown brawlers={enrichedBrawlers} theme={t} />
+      <PowerLevelChart brawlers={player.brawlers} />
 
     </div>
   );
