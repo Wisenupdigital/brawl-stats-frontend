@@ -1,4 +1,4 @@
-export const API_BASE = "brawl-stats-backend-production.up.railway.app/api";
+export const API_BASE = "https://brawl-stats-backend-production.up.railway.app/api";
 
 export async function apiFetch(endpoint) {
   const res = await fetch(`${API_BASE}${endpoint}`);
