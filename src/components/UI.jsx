@@ -151,54 +151,111 @@ export function BrawlerChip({ brawler }) {
 export function TeamRow({ teams, playerTag }) {
   if (!teams || teams.length === 0) return null;
   const clean = playerTag?.replace("#", "");
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {teams.map((team, ti) => (
         <div key={ti} style={{
-          display: "flex", flexWrap: "wrap", gap: 4,
+          background: "rgba(255,255,255,0.02)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 10,
+          padding: "8px 10px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
         }}>
+          {/* Label équipe */}
+          <div style={{
+            color: "rgba(255,255,255,0.2)",
+            fontSize: "0.58em",
+            textTransform: "uppercase",
+            letterSpacing: "0.12em",
+            fontFamily: "'DM Sans', sans-serif",
+          }}>
+            Équipe {ti + 1}
+          </div>
+
+          {/* Joueurs */}
           {team.map((p, pi) => {
             const isMe = p.tag?.replace("#", "") === clean;
+            const brawlerName = p.brawler?.name || "";
+            const imgUrl = brawlerName
+              ? `https://cdn.brawlify.com/brawlers/borderless/${brawlerName.trim().replace(/\s+/g, "_")}.png`
+              : null;
+
             return (
               <div key={pi} style={{
-                display: "flex", alignItems: "center", gap: 5,
-                background: isMe ? "rgba(245,166,35,0.08)" : "rgba(255,255,255,0.03)",
-                border: `1px solid ${isMe ? "rgba(245,166,35,0.25)" : "rgba(255,255,255,0.06)"}`,
-                borderRadius: 7, padding: "4px 8px",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: isMe ? "rgba(245,166,35,0.06)" : "transparent",
+                borderRadius: 8,
+                padding: "5px 6px",
+                border: isMe ? "1px solid rgba(245,166,35,0.2)" : "1px solid transparent",
               }}>
-                {/* Initiales brawler */}
+                {/* Image brawler */}
                 <div style={{
-                  width: 20, height: 20, borderRadius: 5,
-                  background: isMe ? "rgba(245,166,35,0.2)" : "rgba(255,255,255,0.06)",
+                  width: 38, height: 38, flexShrink: 0,
+                  borderRadius: 10,
+                  background: isMe ? "rgba(245,166,35,0.12)" : "rgba(255,255,255,0.05)",
+                  border: `1px solid ${isMe ? "rgba(245,166,35,0.3)" : "rgba(255,255,255,0.08)"}`,
+                  overflow: "hidden",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "0.58em", fontWeight: 800,
-                  color: isMe ? "#f5a623" : "#555",
-                  fontFamily: "'Outfit', sans-serif",
-                  flexShrink: 0,
                 }}>
-                  {p.brawler?.name?.slice(0, 2).toUpperCase() || "??"}
+                  {imgUrl ? (
+                    <img
+                      src={imgUrl}
+                      alt={brawlerName}
+                      style={{ width: 34, height: 34, objectFit: "contain" }}
+                      onError={e => {
+                        e.target.style.display = "none";
+                        e.target.parentNode.innerHTML = `<span style="font-size:0.65em;font-weight:800;color:${isMe ? "#f5a623" : "#555"};font-family:Outfit,sans-serif">${brawlerName.slice(0,2).toUpperCase()}</span>`;
+                      }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: "0.65em", fontWeight: 800, color: isMe ? "#f5a623" : "#555", fontFamily: "Outfit,sans-serif" }}>??</span>
+                  )}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {/* Pseudo joueur */}
-                  <span style={{
-                    color: isMe ? "#f5a623" : "rgba(255,255,255,0.7)",
-                    fontSize: "0.72em",
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: isMe ? 700 : 500,
-                    lineHeight: 1,
+
+                {/* Infos joueur */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    color: isMe ? "#f5a623" : "rgba(255,255,255,0.8)",
+                    fontSize: "0.78em",
+                    fontFamily: "'Outfit', sans-serif",
+                    fontWeight: isMe ? 700 : 600,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}>
                     {p.name || "???"}
-                  </span>
-                  {/* Brawler + trophées */}
-                  <span style={{
+                    {isMe && <span style={{ fontSize: "0.75em", marginLeft: 5, opacity: 0.7 }}>· toi</span>}
+                  </div>
+                  <div style={{
                     color: "rgba(255,255,255,0.3)",
-                    fontSize: "0.62em",
+                    fontSize: "0.67em",
                     fontFamily: "'DM Sans', sans-serif",
-                    lineHeight: 1,
+                    marginTop: 1,
                   }}>
-                    {p.brawler?.name} {p.brawler?.trophies ? `· 🏆${p.brawler.trophies}` : ""}
-                  </span>
+                    {p.brawler?.trophies ? `· 🏆 ${p.brawler.trophies}` : ""}
+                  </div>
                 </div>
+
+                {/* Power level */}
+                {p.brawler?.power && (
+                  <div style={{
+                    flexShrink: 0,
+                    background: "rgba(255,255,255,0.05)",
+                    borderRadius: 6,
+                    padding: "2px 7px",
+                    color: "rgba(255,255,255,0.35)",
+                    fontSize: "0.65em",
+                    fontFamily: "'Outfit', sans-serif",
+                    fontWeight: 700,
+                  }}>
+                    Lvl {p.brawler.power}
+                  </div>
+                )}
               </div>
             );
           })}
