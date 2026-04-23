@@ -152,27 +152,59 @@ export function TeamRow({ teams, playerTag }) {
   if (!teams || teams.length === 0) return null;
   const clean = playerTag?.replace("#", "");
   return (
-    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
       {teams.map((team, ti) => (
         <div key={ti} style={{
-          display: "flex", gap: 4, alignItems: "center",
-          background: "rgba(255,255,255,0.02)", borderRadius: 6, padding: "3px 7px",
-          border: "1px solid rgba(255,255,255,0.04)",
+          display: "flex", flexWrap: "wrap", gap: 4,
         }}>
           {team.map((p, pi) => {
             const isMe = p.tag?.replace("#", "") === clean;
             return (
-              <span key={pi} style={{
-                fontSize: "0.68em", fontFamily: "'DM Sans', sans-serif",
-                color: isMe ? "#f5a623" : "#444",
-                fontWeight: isMe ? 700 : 400,
+              <div key={pi} style={{
+                display: "flex", alignItems: "center", gap: 5,
+                background: isMe ? "rgba(245,166,35,0.08)" : "rgba(255,255,255,0.03)",
+                border: `1px solid ${isMe ? "rgba(245,166,35,0.25)" : "rgba(255,255,255,0.06)"}`,
+                borderRadius: 7, padding: "4px 8px",
               }}>
-                {p.brawler?.name || p.name}
-              </span>
+                {/* Initiales brawler */}
+                <div style={{
+                  width: 20, height: 20, borderRadius: 5,
+                  background: isMe ? "rgba(245,166,35,0.2)" : "rgba(255,255,255,0.06)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "0.58em", fontWeight: 800,
+                  color: isMe ? "#f5a623" : "#555",
+                  fontFamily: "'Outfit', sans-serif",
+                  flexShrink: 0,
+                }}>
+                  {p.brawler?.name?.slice(0, 2).toUpperCase() || "??"}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  {/* Pseudo joueur */}
+                  <span style={{
+                    color: isMe ? "#f5a623" : "rgba(255,255,255,0.7)",
+                    fontSize: "0.72em",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: isMe ? 700 : 500,
+                    lineHeight: 1,
+                  }}>
+                    {p.name || "???"}
+                  </span>
+                  {/* Brawler + trophées */}
+                  <span style={{
+                    color: "rgba(255,255,255,0.3)",
+                    fontSize: "0.62em",
+                    fontFamily: "'DM Sans', sans-serif",
+                    lineHeight: 1,
+                  }}>
+                    {p.brawler?.name} {p.brawler?.trophies ? `· 🏆${p.brawler.trophies}` : ""}
+                  </span>
+                </div>
+              </div>
             );
           })}
         </div>
       ))}
     </div>
   );
+}
 }
