@@ -207,4 +207,3 @@ export function TeamRow({ teams, playerTag }) {
     </div>
   );
 }
-}
