@@ -95,31 +95,97 @@ export function BattleCard({ battle, playerTag, index }) {
             </div>
           )}
           {battle.battle?.players?.length > 0 && (
-            <div>
-              <div style={{ color: "#252525", fontSize: "0.6em", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>Joueurs</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {battle.battle.players.map((p, i) => {
-                  const isMe = p.tag?.replace("#", "") === playerTag?.replace("#", "");
-                  return (
-                    <span key={i} style={{
-                      background: isMe ? "rgba(245,166,35,0.1)" : "rgba(255,255,255,0.03)",
-                      border: `1px solid ${isMe ? "rgba(245,166,35,0.25)" : "rgba(255,255,255,0.05)"}`,
-                      borderRadius: 6, padding: "2px 8px",
-                      color: isMe ? "#f5a623" : "#444",
-                      fontSize: "0.68em", fontFamily: "'DM Sans', sans-serif",
-                    }}>
-                      {p.brawler?.name || p.name} {p.brawler?.trophies ? `· 🏆${p.brawler.trophies}` : ""}
-                    </span>
-                  );
-                })}
+  <div>
+    <div style={{ color: "#252525", fontSize: "0.6em", textTransform: "uppercase", letterSpacing: "0.12em", fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>Joueurs</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+      {battle.battle.players.map((p, i) => {
+        const isMe = p.tag?.replace("#", "") === playerTag?.replace("#", "");
+        const brawlerName = p.brawler?.name || "";
+        const imgUrl = p.brawler?.id
+          ? `https://cdn.brawlify.com/brawlers/borderless/${p.brawler.id}.png`
+          : brawlerName
+            ? `https://cdn.brawlify.com/brawlers/borderless/${brawlerName.trim().replace(/\s+/g, "_")}.png`
+            : null;
+
+        return (
+          <div key={i} style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: isMe ? "rgba(245,166,35,0.06)" : "rgba(255,255,255,0.02)",
+            border: `1px solid ${isMe ? "rgba(245,166,35,0.2)" : "rgba(255,255,255,0.05)"}`,
+            borderRadius: 8,
+            padding: "5px 8px",
+          }}>
+            {/* Image brawler */}
+            <div style={{
+              width: 38, height: 38, flexShrink: 0,
+              borderRadius: 10,
+              background: isMe ? "rgba(245,166,35,0.12)" : "rgba(255,255,255,0.05)",
+              border: `1px solid ${isMe ? "rgba(245,166,35,0.3)" : "rgba(255,255,255,0.08)"}`,
+              overflow: "hidden",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {imgUrl ? (
+                <img
+                  src={imgUrl}
+                  alt={brawlerName}
+                  style={{ width: 34, height: 34, objectFit: "contain" }}
+                  onError={e => {
+                    e.target.style.display = "none";
+                    e.target.parentNode.innerHTML = `<span style="font-size:0.65em;font-weight:800;color:${isMe ? "#f5a623" : "#555"};font-family:Outfit,sans-serif">${brawlerName.slice(0,2).toUpperCase()}</span>`;
+                  }}
+                />
+              ) : (
+                <span style={{ fontSize: "0.65em", fontWeight: 800, color: isMe ? "#f5a623" : "#555", fontFamily: "Outfit,sans-serif" }}>??</span>
+              )}
+            </div>
+
+            {/* Infos joueur */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{
+                color: isMe ? "#f5a623" : "rgba(255,255,255,0.8)",
+                fontSize: "0.78em",
+                fontFamily: "'Outfit', sans-serif",
+                fontWeight: isMe ? 700 : 600,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}>
+                {p.name || "???"}
+                {isMe && <span style={{ fontSize: "0.75em", marginLeft: 5, opacity: 0.7 }}>· toi</span>}
+              </div>
+              <div style={{
+                color: "rgba(255,255,255,0.3)",
+                fontSize: "0.67em",
+                fontFamily: "'DM Sans', sans-serif",
+                marginTop: 1,
+              }}>
+                {p.brawler?.trophies ? `🏆 ${p.brawler.trophies}` : ""}
               </div>
             </div>
-          )}
-        </div>
-      )}
+
+            {/* Power level */}
+            {p.brawler?.power && (
+              <div style={{
+                flexShrink: 0,
+                background: "rgba(255,255,255,0.05)",
+                borderRadius: 6,
+                padding: "2px 7px",
+                color: "rgba(255,255,255,0.35)",
+                fontSize: "0.65em",
+                fontFamily: "'Outfit', sans-serif",
+                fontWeight: 700,
+              }}>
+                Lvl {p.brawler.power}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
-  );
-}
+  </div>
+)}
 
 // ── BattleStats ───────────────────────────────────────────────────────────────
 export function BattleStats({ battles, playerTag }) {
