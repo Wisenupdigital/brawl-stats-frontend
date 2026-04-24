@@ -186,6 +186,7 @@ export function BattleCard({ battle, playerTag, index }) {
     </div>
   </div>
 )}
+}
 
 // ── BattleStats ───────────────────────────────────────────────────────────────
 export function BattleStats({ battles, playerTag }) {
