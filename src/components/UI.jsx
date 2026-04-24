@@ -179,9 +179,11 @@ export function TeamRow({ teams, playerTag }) {
           {team.map((p, pi) => {
             const isMe = p.tag?.replace("#", "") === clean;
             const brawlerName = p.brawler?.name || "";
-            const imgUrl = brawlerName
-              ? `https://cdn.brawlify.com/brawlers/borderless/${brawlerName.trim().replace(/\s+/g, "_")}.png`
-              : null;
+            const imgUrl = p.brawler?.id
+  ? `https://cdn.brawlify.com/brawlers/borderless/${p.brawler.id}.png`
+  : brawlerName
+    ? `https://cdn.brawlify.com/brawlers/borderless/${brawlerName.trim().replace(/\s+/g, "_")}.png`
+    : null;
 
             return (
               <div key={pi} style={{
